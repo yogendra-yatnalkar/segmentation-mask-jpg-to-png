@@ -24,6 +24,19 @@ def get_color_distance(color_image_1, color_image_2):
     color_distance = np.sqrt(squared_color_distance)
     return color_distance
 
+def get_mask_distance_from_rgb_label(mask, label_li):
+    """
+    Inputs:
+        - mask: HxWxC jpg currpted mask
+        - label_value: List containing RGB value of the actual/true 
+    Returns:
+        - Distance of every pixel of mask to the given label value
+    """
+    label_arr = np.array(label_li)
+    label_img = np.zeros(mask.shape) + label_arr
+    label_img = label_img.astype(mask.dtype)
+    distance_from_label = get_color_distance(mask, label_img)
+    pass
 
 def get_rgb_mask_from_label(label_arr, mask_shape=(1966, 1966, 3)):
     mask = np.zeros(mask_shape)
@@ -136,4 +149,3 @@ if __name__ == "__main__":
 
         end = time.time()
         print("\nTIME REQUIRED: ", end - start, " sec\n")
-

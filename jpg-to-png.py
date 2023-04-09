@@ -3,6 +3,12 @@ import cv2
 import os
 import time
 
+def get_unique_rgb_colors(img):
+    """
+    returns a numpy array of unique rgb colors in input HxWxC image
+    """
+    reshaped_img = img.reshape((-1, img.shape[-1]))
+    return np.unique(reshaped_img, axis = 0)
 
 def get_color_distance(color_image_1, color_image_2):
     color_image_1 = color_image_1.astype(np.float64)
@@ -36,116 +42,77 @@ def get_mask_distance_from_rgb_label(mask, label_li):
     label_img = np.zeros(mask.shape) + label_arr
     label_img = label_img.astype(mask.dtype)
     distance_from_label = get_color_distance(mask, label_img)
-    pass
+    return distance_from_label
 
-def get_rgb_mask_from_label(label_arr, mask_shape=(1966, 1966, 3)):
-    mask = np.zeros(mask_shape)
+def get_corrected_single_channel_mask(mask, all_labels_li):
+    mask_shape = mask.shape
+    multiple_distance_img_li = []
+    print("Mask Shape: ", mask_shape)
 
-    index = np.where(label_arr == 0)
-    mask[index] = [255, 0, 0]
-    del index
+    for label_li in all_labels_li:
+        distance_img = get_mask_distance_from_rgb_label(mask, label_li)
+        multiple_distance_img_li.append(distance_img)
+        print(distance_img.shape)
 
-    index = np.where(label_arr == 1)
-    mask[index] = [0, 255, 0]
-    del index
+    multiple_distance_arr = np.array(multiple_distance_img_li)
+    print(multiple_distance_arr.shape)
 
-    index = np.where(label_arr == 2)
-    mask[index] = [0, 0, 255]
-    del index
+    multiple_distance_arr = multiple_distance_arr.transpose(1,2,0)
+    print(multiple_distance_arr.shape)
 
-    index = np.where(label_arr == 3)
-    mask[index] = [255, 255, 255]
-    del index
+    label_arr = np.argmin(multiple_distance_arr, axis=-1)
+    print('label_arr', label_arr, label_arr.shape)
+    unique_colors, count = np.unique(label_arr, return_counts=True)
+    print(unique_colors, count)
 
-    index = np.where(label_arr == 4)
-    mask[index] = [255, 255, 255]
-    del index
+    new_mask = np.zeros(mask_shape)
+    for iter_index, item in enumerate(all_labels_li):
+        print("iter_index", iter_index)
+        print("Item: ", item)
+        found_index = np.where(label_arr == iter_index)
+        new_mask[found_index] = item
 
-    mask = mask.astype(np.uint8)
-    return mask
-
-
-def sorted_unique_colors_on_count(mask):
-    vertical_mask = np.vstack(mask)
-    unique_colors, count = np.unique(vertical_mask, axis=0, return_counts=True)
-    sort_index = np.argsort(count)
-
-    sorted_unique_colors = unique_colors[sort_index]
-    sorted_count = count[sort_index]
-
-    return sorted_unique_colors, sorted_count, unique_colors, count
-
+    new_mask = new_mask.astype(np.uint8)
+    return new_mask
 
 if __name__ == "__main__":
-    mask_dir_path = "./masks/"
-    save_path = "./updated_masks/"
-    mask_names = os.listdir(mask_dir_path)
+    # getting the file-paths
+    file_path = "D:\software-dev\jpg-to-png\data"
+    jpg_file_name = "jpg-mask.jpg"
+    png_file_name = "png-mask.png"
+    jpg_img_path = os.path.join(file_path, jpg_file_name)
+    png_img_path = os.path.join(file_path, png_file_name)
 
-    for mask_name in mask_names:
-        start = time.time()
+    # reading the mask
+    jpg_mask = cv2.imread(jpg_img_path)
+    png_mask = cv2.imread(png_img_path)
 
-        new_mask_name = mask_name.rsplit(".", 1)[0] + ".png"
-        mask_path = os.path.join(mask_dir_path, mask_name)
-        print(mask_path)
-        mask = cv2.imread(mask_path)
+    # printing the unique colors from mask
+    jpg_unique_colors = get_unique_rgb_colors(jpg_mask)
+    png_unique_colors = get_unique_rgb_colors(png_mask)
 
-        blue_img = np.zeros(mask.shape) + [255, 0, 0]
-        blue_img = blue_img.astype(mask.dtype)
+    print("Number of unique colors in JPG Mask: ", len(jpg_unique_colors))
+    print("JPG Unique Colors:\n ", jpg_unique_colors)
+    print("\n", "="*30, "\n")
+    print("Number of unique colors in PNG Mask: ", len(png_unique_colors))
+    print("PNG Unique Colors:\n ", png_unique_colors)
 
-        green_img = np.zeros(mask.shape) + [0, 255, 0]
-        green_img = green_img.astype(mask.dtype)
+    all_labels = [[0, 0, 255], [0, 255, 0], [255, 0, 0], [255, 255, 255]]
+    new_mask = get_corrected_single_channel_mask(jpg_mask, all_labels)
 
-        red_img = np.zeros(mask.shape) + [0, 0, 255]
-        red_img = red_img.astype(mask.dtype)
+    img = png_mask
+    reshaped_img = img.reshape((-1, img.shape[-1]))
+    unique_colors, count = np.unique(reshaped_img, axis = 0, return_counts = True)
+    print(unique_colors, count)
 
-        white_img = np.zeros(mask.shape) + [255, 255, 255]
-        white_img = white_img.astype(mask.dtype)
+    print("COMPARING PNG AND NEW MASK")
+    equal_check = np.array_equal(new_mask, png_mask)
+    print("Equal Status Check: ", equal_check)
 
-        black_img = np.zeros(mask.shape) + [0, 0, 0]
-        black_img = black_img.astype(mask.dtype)
 
-        distance_from_blue = get_color_distance(mask, blue_img)
-        distance_from_green = get_color_distance(mask, green_img)
-        distance_from_red = get_color_distance(mask, red_img)
-        distance_from_white = get_color_distance(mask, white_img)
-        distance_from_black = get_color_distance(mask, black_img)
+    # plotting the image
+    cv2.imshow("jpg-mask", jpg_mask)
+    cv2.imshow("png-mask", png_mask)
 
-        distance_array = np.dstack(
-            (
-                distance_from_blue,
-                distance_from_green,
-                distance_from_red,
-                distance_from_white,
-                distance_from_black,
-            )
-        )
-        label_array = np.argmin(distance_array, axis=-1)
-
-        unique_colors, count = np.unique(label_array, return_counts=True)
-        print(unique_colors, count)
-
-        new_mask = get_rgb_mask_from_label(label_array)
-        cv2.imwrite(os.path.join(save_path, new_mask_name), new_mask)
-
-        (
-            sorted_mask_unq_colors,
-            sorted_mask_col_count,
-            mask_unq_colors,
-            mask_col_count,
-        ) = sorted_unique_colors_on_count(mask)
-        print(mask_unq_colors, mask_col_count)
-        print(sorted_mask_unq_colors, sorted_mask_col_count)
-
-        print("\n--------------------------------------\n")
-
-        (
-            sorted_new_mask_unq_colors,
-            sorted_new_mask_col_count,
-            new_mask_unq_colors,
-            new_mask_col_count,
-        ) = sorted_unique_colors_on_count(new_mask)
-        print(new_mask_unq_colors, new_mask_col_count)
-        print(sorted_new_mask_unq_colors, sorted_new_mask_col_count)
-
-        end = time.time()
-        print("\nTIME REQUIRED: ", end - start, " sec\n")
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()

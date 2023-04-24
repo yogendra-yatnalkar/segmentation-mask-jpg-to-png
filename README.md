@@ -19,11 +19,11 @@
   BLUE,GREEN,RED and WHITE
   ```
 
-![](D:\software-dev\jpg-to-png\screenshots\mask-creation.png)
+![](./screenshots/mask-creation.png)
 
 - If both the JPG and PNG masks are zoomed to an extensive level, we can observe that the edges of JPG masks are blurry and varous shades of green are visible. On the other hand, the PNG image is intact. 
 
-<img title="" src="file:///D:/software-dev/jpg-to-png/screenshots/jpg-curroption.png" alt="" width="696" data-align="center">
+![](./screenshots/jpg-curroption.png)
 
 - If we look at the unique colors from the masks, we can observe that, JPG image has lot of unique colors but our mask should only contain 4 unique colors which are: RED, BLUE, GREEN and WHITE. 
   
@@ -31,7 +31,7 @@
   
   <mark>PNG MASK: **<u>4 Unique colors</u>**</mark>
   
-  ![](D:\software-dev\jpg-to-png\screenshots\unique_color_count.png)
+  ![](./screenshots/unique_color_count.png)
 
 - **If you are a deep-learning practioner, you will realize that that having so many different colors is a segmentation mask has very undesirable effect on the segmentation training.**
 

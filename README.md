@@ -27,9 +27,9 @@
 
 - If we look at the unique colors from the masks, we can observe that, JPG image has lot of unique colors but our mask should only contain 4 unique colors which are: RED, BLUE, GREEN and WHITE. 
   
-  <mark>JPG MASK: **<u>1041 Unique colors</u>**</mark>
+  <mark color = "yellow">JPG MASK: **<u>1041 Unique colors</u>**</mark>
   
-  <mark>PNG MASK: **<u>4 Unique colors</u>**</mark>
+  <mark color = "yollow">PNG MASK: **<u>4 Unique colors</u>**</mark>
   
   ![](./screenshots/unique_color_count.png)
 

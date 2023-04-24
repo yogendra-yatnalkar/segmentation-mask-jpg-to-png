@@ -2,17 +2,22 @@
 
 ---
 
-- Image Segmentation task needs a set of training images and its corresponding segmentation mask. Within the AI industry, I have seen it first-hand that deveopers and companies store their self-tagged pracious segmentation labels in "JPG" format.
+- Image segmentation is a task that requires a set of training images and their corresponding segmentation masks. Within the AI industry, I have seen it first-hand that developers and companies store their self-tagged precious segmentation labels in “JPG” format. 
 
-- **But, they often dont realize that JPG images are stored using lossy compression format and the segmentation mask gets corrupted when saved in JPG format**
+- **However, they often don’t realize that JPG images are stored using a lossy compression format and the segmentation mask gets corrupted when saved in JPG format.**
 
-- In this repo, we will see how JPG's information loss is a big problem during segmentation training and proposes a heuristic approach to convert the JPG segmentation masks to PNG masks. 
+- In this repo, we will see how JPG’s information loss is a big problem during segmentation training and propose a heuristic approach to convert the JPG segmentation masks to PNG masks. 
 
 ---
 
 ### JPG Corruption:
 
-- Let's consider a RGB segmentation mask saved as JPG and PNG simultaneously. I have created one for our task which can be viewed below. This RGB mask is later saved in JPG and PNG format. 
+- Let's create a RGB segmentation mask and save it as JPG and PNG images simultaneously. I have created one for our task which can be viewed below.
+  
+  ```
+  Please note: The image has only four colors which are: 
+  BLUE,GREEN,RED and WHITE
+  ```
 
 ![](D:\software-dev\jpg-to-png\screenshots\mask-creation.png)
 
@@ -35,3 +40,5 @@
 ### Finally, we also propose a heuristic based solution to convert curropted JPG masks to 100% accurate PNG masks.
 
 - The solution is available in the code-file: <mark>**jpg-to-png.py**</mark>
+  
+  `RUN the code using: <mark>python jpg-to-png.py`

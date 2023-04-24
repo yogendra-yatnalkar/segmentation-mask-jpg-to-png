@@ -41,4 +41,6 @@
 
 - The solution is available in the code-file: <mark>**jpg-to-png.py**</mark>
   
-  `RUN the code using: <mark>python jpg-to-png.py`
+  ```py
+  python ./jpg-to-png.py
+  ```
